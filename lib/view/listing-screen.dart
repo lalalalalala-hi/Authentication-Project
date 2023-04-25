@@ -1,5 +1,5 @@
 import 'package:facebook_auth/model/listing_api_client.dart';
-import 'package:facebook_auth/view-model/listing-view-model.dart';
+
 import 'package:facebook_auth/view-model/logout-view-model.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
@@ -14,24 +14,43 @@ class ListPage extends StatefulWidget {
 }
 
 class _ListPageState extends State<ListPage> {
-  final _listViewModel = ListViewModel();
   final _logoutViewModel = LogoutViewModel();
   final _listingApiClient = ListingApiClient();
   Map<String, dynamic> listings = {};
   bool isloading = true;
+  bool _mounted = true;
 
   @override
   void initState() {
+    _loadListing();
     super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((_) async {
-      final listing =
-          await _listingApiClient.getListing(widget.id, widget.token);
-      print(listing);
+  }
+
+  @override
+  void didUpdateWidget(ListPage oldWidget) {
+    if (oldWidget.id != widget.id || oldWidget.token != widget.token) {
+      _loadListing();
+    }
+    super.didUpdateWidget(oldWidget);
+  }
+
+  void _loadListing() async {
+    setState(() {
+      isloading = true;
+    });
+    final listing = await _listingApiClient.getListing(widget.id, widget.token);
+    if (_mounted) {
       setState(() {
         listings = listing;
         isloading = false;
       });
-    });
+    }
+  }
+
+  @override
+  void dispose() {
+    _mounted = false;
+    super.dispose();
   }
 
   @override
@@ -84,6 +103,7 @@ class _ListPageState extends State<ListPage> {
               leading: const Icon(Icons.logout),
               title: const Text('Logout'),
               onTap: () async {
+                _mounted = false;
                 await _logoutViewModel.logout(context);
               },
             ),

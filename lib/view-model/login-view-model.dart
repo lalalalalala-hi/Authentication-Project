@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:facebook_auth/model/user.dart';
 import 'package:facebook_auth/model/login_api_client.dart';
 import 'package:facebook_auth/view/listing-screen.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class LoginViewModel {
   Future<void> login(
@@ -12,6 +13,7 @@ class LoginViewModel {
     final user = User(email: email, password: password);
     final apiClient =
         LoginApiClient(email: user.email, password: user.password);
+
     final Map<String, dynamic> json = await apiClient.login();
     final id = json['id'].toString();
     final token = json['token'];
@@ -24,7 +26,11 @@ class LoginViewModel {
     debugPrint('Status: $status');
 
     if (code == 200) {
-      // ignore: use_build_context_synchronously
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.setBool('isLoggedIn', true);
+      await prefs.setString('id', id);
+      await prefs.setString('token', token);
+
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(

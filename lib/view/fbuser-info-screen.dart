@@ -2,9 +2,11 @@ import 'package:facebook_auth/view-model/FBloginout-vew-model.dart';
 import 'package:flutter/material.dart';
 
 class FBUserInfo extends StatefulWidget {
-  final Map<String, dynamic> userData;
-
-  const FBUserInfo({super.key, required this.userData});
+  final String email;
+  final String name;
+  final String url;
+  const FBUserInfo(
+      {super.key, required this.email, required this.name, required this.url});
 
   @override
   State<FBUserInfo> createState() => _FBUserInfoState();
@@ -33,8 +35,7 @@ class _FBUserInfoState extends State<FBUserInfo> {
             const SizedBox(height: 40),
             CircleAvatar(
               radius: 100.0,
-              backgroundImage:
-                  NetworkImage('${widget.userData['picture']['data']['url']}'),
+              backgroundImage: NetworkImage(widget.url),
             ),
             const SizedBox(height: 15),
             Expanded(
@@ -44,14 +45,14 @@ class _FBUserInfoState extends State<FBUserInfo> {
                 child: Column(
                   children: [
                     Text(
-                      "${widget.userData['name']}",
+                      widget.name,
                       style: const TextStyle(
                         fontSize: 20,
                         fontWeight: FontWeight.bold,
                       ),
                     ),
                     Text(
-                      "${widget.userData['email']}",
+                      widget.email,
                       style: const TextStyle(
                         fontSize: 15,
                         fontWeight: FontWeight.normal,
